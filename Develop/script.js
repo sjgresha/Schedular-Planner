@@ -8,14 +8,12 @@ $(function () {
   // function? How can DOM traversal be used to get the "hour-x" id of the
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
-  var eventId;
-  var scheduledEvent;
 
   $(".saveBtn").click(function () {
-    eventId = $(this).parents().attr("id");
-    scheduledEvent = $(this).parents().find("> textarea").val();
+    var eventId = $(this).parents().attr("id");
+    var eventText = $(this).parents().find("> textarea").val();
 
-    localStorage.setItem(eventId, scheduledEvent);
+    localStorage.setItem(eventId, eventText);
   });
 
   //
@@ -24,17 +22,41 @@ $(function () {
   // attribute of each time-block be used to conditionally add or remove the
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
-  timeId;
-  timeHourBlock;
+  var hourBlockId;
+  var hourBlock;
 
-  $
+  $(document).ready(function () {
+    $("time-block").each(function () {
+      var currentHour = dayjs().hour();
+
+      hourBlockId = $(this).attr("id");
+      hourBlock = parseInt(hourBlockId.replace("hour-",""));
+
+      if (hourBlock < currentHour) {
+        $(this).addClass("past");
+      } else if (hourBlock === currentHour) {
+        $(this).addClass("present");
+      } else if (hourBlock > currentHour) {
+        $(this).addClass("future");
+      }
+
   //
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
   //
+
+      var savedEventText = localStorage.getItem(hourBlockId);
+      var eventTextArea = $(this).find(">textarea");
+
+      $(eventTextArea).val(savedEventText);
+
+    });
+
+  })
+
   // TODO: Add code to display the current date in the header of the page.
 
   var todaysDate = dayjs();
-  $("currentDay").text(todaysDate.format("dddd, MMMM D, YYYY - h A"));
+  $("currentDay").text(todaysDate.format("dddd, MMMM D, YYYY"));
 });
